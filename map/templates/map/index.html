@@ -1,0 +1,14 @@
+{% if latest_trash_list %}
+
+	<table>
+	{% for bin in latest_trash_list %}
+		<tr>
+			<td>
+				<a href="{% url 'map:detail' bin.id %}"> {{bin.info}}</a>
+			</td>
+		</tr>
+	{% endfor %}
+	</table>
+{% else %}
+	<p> No polls are available. </p>
+{% endif %}
