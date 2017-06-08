@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 #work {
   color: green;
 }
@@ -5,3 +6,12 @@
 #broke {
   color: red;
 }
+=======
+li a {
+	color: green;
+}
+
+p {
+	color: red;
+}
+>>>>>>> 7512e97dbbebffe9bd6930fc0f5d29550fe116ec
