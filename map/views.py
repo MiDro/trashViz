@@ -12,7 +12,7 @@ class IndexView(generic.ListView):
         """ Return the last five published questions. """
         return TrashCan.objects.order_by('-name')[::-1]
 
-
+ 	
 class DetailView(generic.DetailView):
     template_name = 'map/detail.html'
     model = TrashCan
