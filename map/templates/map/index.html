@@ -1,59 +1,82 @@
 {% load static %}
 
-<!-- Latest compiled and minified CSS -->
-<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u" crossorigin="anonymous">
+<head>
+	<!-- Latest compiled and minified CSS -->
+	<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u" crossorigin="anonymous">
 
-<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
-<!-- Optional theme -->
-<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap-theme.min.css" integrity="sha384-rHyoN1iRsVXV4nD0JutlnGaslCJuC7uwjduW9SVrLvRYooPp2bWYgmgJQIXwl/Sp" crossorigin="anonymous">
+	<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+	<!-- Optional theme -->
+	<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap-theme.min.css" integrity="sha384-rHyoN1iRsVXV4nD0JutlnGaslCJuC7uwjduW9SVrLvRYooPp2bWYgmgJQIXwl/Sp" crossorigin="anonymous">
 
-<!-- Latest compiled and minified JavaScript -->
-<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js" integrity="sha384-Tc5IQib027qvyjSMfHjOMaLkfuWVxZxUPnCJA7l2mCWNIpG9mGCD8wGNIcPD7Txa" crossorigin="anonymous"></script>
+	<!-- Latest compiled and minified JavaScript -->
+	<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js" integrity="sha384-Tc5IQib027qvyjSMfHjOMaLkfuWVxZxUPnCJA7l2mCWNIpG9mGCD8wGNIcPD7Txa" crossorigin="anonymous"></script>
 
-<link rel="stylesheet" type="text/css" href="{% static 'map/style.css' %}" />
+	<link rel="stylesheet" type="text/css" href="{% static 'map/style.css' %}" />
+</head>
 
-{% if latest_trash_list %}
-	<table class="table">
-	{% for bin in latest_trash_list %}
-		<tr>
-			<td>
-				{{bin.name}}
-			</td>
-			<td>
-				{{bin.trashID}}
-			</td>
-			<td>
-				{% if bin.status == True %}
-				<span id="work">Working</span>
-				{% else %}
-				<span id="broke">Broken</span>
-				{% endif %}
-			</td>
-			<td>
-				{{bin.fillLevel}}
-			</td>
-			<td>
-				{{bin.location}}
-			</td>
-			<td>
-				<a href="{% url 'map:detail' bin.id %}"> {{bin.info}}</a>
-			</td>
-			<td>
-				{{bin.latitude}}, {{bin.longitude}}
-			</td>
-		</tr>
-	{% endfor %}
-	</table>
-	{% comment "optional note" %}
-		<p>
-			Have fun
-		</p>
-	{% endcomment %}
-{% else %}
-	<p> No polls are available. </p>
-{% endif %}
+<body>
+	<div class="col-md-2"></div>
+	<div class="col-md-8">
+		<div id="map"></div>
+		{% if latest_trash_list %}
+			<table class="table table-hover table-bordered" id="infoTable">
+				<thead>
+					<th>
+						Name
+					</th>
+					<th>
+						ID
+					</th>
+					<th>
+						Status
+					</th>
+					<th>
+						Fill Percent
+					</th>
+					<th>
+						Location
+					</th>
+				</thead>
+			{% for bin in latest_trash_list %}
+			<a href="{% url 'map:detail' bin.id %}">
+				<tr {% if bin.status == False %} class="danger" {% endif %}>
+					<td>
+						{{bin.name}}
+					</td>
+					<td>
+						{{bin.trashID}}
+					</td>
+					<td>
+						{% if bin.status == True %}
+						<span id="work">Working</span>
+						{% else %}
+						<span id="broke">Broken</span>
+						{% endif %}
+					</td>
+					<td>
+						{{bin.fillLevel}}%
+					</td>
+					<td>
+						{{bin.location}}
+					</td>
+				</tr>
+				</a>
+			{% endfor %}
+			</table>
+			{% comment "optional note" %}
+				<p>
+					Have fun
+				</p>
+			{% endcomment %}
+		{% else %}
+			<p> No polls are available. </p>
+		{% endif %}
 
-<div id="map"></div>
-<script type="text/javascript" src="{% url 'map:map' %}"></script>
 
-<script async defer src="https://maps.googleapis.com/maps/api/js?key=AIzaSyB1uo7LAIZj8Xj7RKQOkN3INPlTBG_U2uY&callback=initMap"></script>
+		<script type="text/javascript" src="{% url 'map:map' %}"></script>
+
+		<script async defer src="https://maps.googleapis.com/maps/api/js?key=AIzaSyB1uo7LAIZj8Xj7RKQOkN3INPlTBG_U2uY&callback=initMap"></script>
+	</div>
+	<div class="col-md-2"></div>
+
+</body>
