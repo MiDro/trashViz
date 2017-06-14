@@ -1,13 +1,100 @@
 {% extends 'map/base.html' %}
 {% block content %}
+
+<head>
+<style>
+h1 {
+	padding-bottom: 10px;
+}
+table {
+    font-family: arial, sans-serif;
+    border-collapse: collapse;
+    width: 100%;
+		border: 2px solid black;
+}
+th {
+    border: 2px solid black;
+    text-align: center;
+    padding: 8px;
+}
+td {
+    border: 2px solid black;
+    text-align: left;
+    padding: 8px;
+}
+tr:nth-child(even) {
+    background-color: #a3ccff;
+}
+</style>
+</head>
 <h1 id="trashname">{{trashcan.name}}|
 	<span style="color:{% if trashcan.status == False %}red{% endif %}"id="status">{% if trashcan.status == True %}Working{% else %}Broken{% endif %}</span>
 </h1>
-<ul class="nav nav-pills" id="customnav">
-  <li role="presentation"><a href="#">Information</a></li>
-	<li role="presentation"><a href="#">Data</a></li>
-	<li role="presentation"><a href="#">Other</a></li>
-</ul>
-
+<table bordercolor=black>
+	<tr id="customnav">
+		<th>INFORMATION</th>
+		<th>DATA</th>
+		<th>OTHER</th>
+	</tr>
+	<tr>
+		<td>Name</td>
+		<td>{{trashcan.name}}</td>
+		<td></td>
+	</tr>
+	<tr>
+		<td>Trash ID</td>
+		<td>{{trashcan.trashID}}</td>
+		<td></td>
+	</tr>
+	<tr>
+		<td> Sensor Status</td>
+		<td>{% if trashcan.status == False %}Broken{% else %}Working{% endif %}</td>
+		<td></td>
+	</tr>
+	<tr>
+		<td>Fill Level</td>
+		<td>{{trashcan.fillLevel}}</td>
+		<td></td>
+	</tr>
+	<tr>
+		<td>Percent Filled</td>
+		<td>{{trashcan.fillLevel}}%</td>
+		<td></td>
+	</tr>
+	<tr>
+		<td>Last Emptied</td>
+		<td>{{trashcan.lastEmptied}}</td>
+		<td></td>
+	</tr>
+	<tr>
+		<td>Max Fill</td>
+		<td>{{trashcan.maxFill}}</td>
+		<td></td>
+	</tr>
+	<tr>
+		<td>Install Date</td>
+		<td>{{trashcan.installDate}}</td>
+		<td></td>
+	</tr>
+	<tr>
+		<td>Location</td>
+		<td>{{trashcan.location}}</td>
+		<td></td>
+	</tr>
+	<tr>
+		<td>Latitude</td>
+		<td>{{trashcan.latitude}}</td>
+		<td></td>
+	</tr>
+	<tr>
+		<td>Longitude</td>
+		<td>{{trashcan.longitude}}</td>
+		<td></td>
+	</tr>
+	<tr>
+		<td>Info</td>
+		<td>{{trashcan.info}}</td>
+		<td></td>
+	</tr>
+</table>
 {% endblock %}
-

@@ -4,17 +4,22 @@ var i;
 var homebase = {lat: 37.724930, lng: -122.156077};
 
 function initMap() {
+    var iconBase = 'https://maps.google.com/mapfiles/kml/shapes/';
     var map = new google.maps.Map(document.getElementById('map'), {
         zoom: 11,
         center: homebase
     });
     var marker = new google.maps.Marker({
         position: homebase,
-        map: map
+        map: map,
+        //icon:'trash.png'
     });
+
     for(i=0; i < lats.length; i++){
         new google.maps.Marker({
-            position: {lat: parseFloat(lats[i]), lng: parseFloat(longs[i])},
+            position:{lat: parseFloat(lats[i]), lng: parseFloat(longs[i])},
+            icon : "/static/map/trash.png",
+            // icon: iconBase + 'library_maps.png',
             map: map
         });
     }

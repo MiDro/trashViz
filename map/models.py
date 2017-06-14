@@ -11,7 +11,6 @@ class TrashCan(models.Model):
     percent = models.FloatField()
     latitude = models.FloatField()
     longitude = models.FloatField()
-    longitude = models.FloatField()
     location = models.CharField(max_length=400)
     trashID = models.IntegerField()
     status = models.BooleanField()
