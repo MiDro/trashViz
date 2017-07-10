@@ -1,8 +1,6 @@
-from django.http import HttpResponse, Http404
-from django.template import loader
-from django.shortcuts import render, get_object_or_404
 from django.views import generic
 from .models import TrashCan
+
 
 class IndexView(generic.ListView):
     template_name = 'map/index.html'
@@ -16,6 +14,7 @@ class IndexView(generic.ListView):
 class DetailView(generic.DetailView):
     template_name = 'map/detail.html'
     model = TrashCan
+
 
 class MapView(generic.ListView):
     template_name = "map/map.js"
