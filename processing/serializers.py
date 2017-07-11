@@ -6,7 +6,7 @@ from processing.models import TrashCan
 class TrashCanSerializer(serializers.ModelSerializer):
     class Meta:
         model = TrashCan
-        fields = ('lastEmptied', 'lastUpdated', 'sensor1', 'sensor2', 'sensor3', 'fillLevel', 'percent', 'full_status', 'latitude', 'longitude', 'location', 'info', 'maxFill', 'installDate', 'trashID', 'owner')
+        fields = ('url', 'lastEmptied', 'lastUpdated', 'sensor1', 'sensor2', 'sensor3', 'fillLevel', 'percent', 'full_status', 'latitude', 'longitude', 'location', 'info', 'maxFill', 'installDate', 'trashID', 'owner')
     lastEmptied = serializers.DateTimeField(required=False)
     lastUpdated = serializers.DateTimeField(required=True)
     sensor1 = serializers.IntegerField(min_value=0.0, required=True)
@@ -49,4 +49,4 @@ class UserSerializer(serializers.ModelSerializer):
     trashcans = serializers.HyperlinkedRelatedField(many=True, view_name='trashcan-detail', read_only=True)
     class Meta:
         model = User
-        fields = ('id', 'username', 'trashcans')
+        fields = ('url', 'id', 'username', 'trashcans')
