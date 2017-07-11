@@ -1,6 +1,7 @@
 from django.db import models
 from django.utils import timezone
 import datetime
+MIDRO=6
 
 # Create your models here.
 class TrashCan(models.Model):
@@ -20,6 +21,7 @@ class TrashCan(models.Model):
 	installDate = models.DateTimeField('installed', default=timezone.now)
 	trashID = models.IntegerField(default='1')
 	name = models.CharField(max_length=30, default='MiDro')
+	owner = models.ForeignKey('auth.User', related_name='trashcans', on_delete=models.CASCADE, default=MIDRO)
 
 
 	def was_published_recently(self):

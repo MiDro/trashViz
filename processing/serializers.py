@@ -1,11 +1,12 @@
 from rest_framework import serializers
+from django.contrib.auth.models import User
 from processing.models import TrashCan
 
 
 class TrashCanSerializer(serializers.ModelSerializer):
     class Meta:
         model = TrashCan
-        fields = ('lastEmptied', 'lastUpdated', 'sensor1', 'sensor2', 'sensor3', 'fillLevel', 'percent', 'full_status', 'latitude', 'longitude', 'location', 'info', 'maxFill', 'installDate', 'trashID')
+        fields = ('lastEmptied', 'lastUpdated', 'sensor1', 'sensor2', 'sensor3', 'fillLevel', 'percent', 'full_status', 'latitude', 'longitude', 'location', 'info', 'maxFill', 'installDate', 'trashID', 'owner')
     lastEmptied = serializers.DateTimeField(required=False)
     lastUpdated = serializers.DateTimeField(required=True)
     sensor1 = serializers.IntegerField(min_value=0.0, required=True)
@@ -21,6 +22,7 @@ class TrashCanSerializer(serializers.ModelSerializer):
     maxFill = serializers.DecimalField(max_digits=None, decimal_places=3, min_value=0.0, required=False)
     installDate = serializers.DateTimeField('installed', read_only=True)
     trashID = serializers.IntegerField(min_value=0, read_only=True)
+    owner = serializers.ReadOnlyField(source='owner.username')
 
 
     def create(self, validated_data):
@@ -42,6 +44,9 @@ class TrashCanSerializer(serializers.ModelSerializer):
         instance.sensor3 = validated_data.get('sensor3', instance.sensor3)
         instance.save()
         return instance
-# class TrashCanSerializer(serializers.Serializer):
 
-
+class UserSerializer(serializers.ModelSerializer):
+    trashcans = serializers.PrimaryKeyRelatedField(many=True, queryset=TrashCan.objects.all())
+    class Meta:
+        model = User
+        fields = ('id', 'username', 'trashcans')
