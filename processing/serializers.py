@@ -46,7 +46,7 @@ class TrashCanSerializer(serializers.ModelSerializer):
         return instance
 
 class UserSerializer(serializers.ModelSerializer):
-    trashcans = serializers.PrimaryKeyRelatedField(many=True, queryset=TrashCan.objects.all())
+    trashcans = serializers.HyperlinkedRelatedField(many=True, view_name='trashcan-detail', read_only=True)
     class Meta:
         model = User
         fields = ('id', 'username', 'trashcans')
