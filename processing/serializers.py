@@ -6,29 +6,17 @@ from processing.models import TrashCan
 class TrashCanSerializer(serializers.ModelSerializer):
     class Meta:
         model = TrashCan
-        fields = (
-            'url',
-            'lastEmptied',
-            'lastUpdated',
-            'sensor1',
-            'sensor2',
-            'sensor3',
-            'fillLevel',
-            'percent',
-            'full_status',
-            'latitude',
-            'longitude',
-            'location',
-            'info',
-            'maxFill',
-            'installDate',
-            'trashID',
-            'owner')
+        fields = ('url', 'lastEmptied', 'lastUpdated', 'sensor1', 
+                  'sensor2', 'sensor3', 'fillLevel', 'percent', 
+                  'full_status', 'latitude', 'longitude', 'location', 
+                  'info', 'maxFill', 'installDate', 'trashID',
+                  'owner', 'json',
+                  )
     lastEmptied = serializers.DateTimeField(required=False)
-    lastUpdated = serializers.DateTimeField(required=True)
-    sensor1 = serializers.IntegerField(min_value=0.0, required=True)
-    sensor2 = serializers.IntegerField(min_value=0.0, required=True)
-    sensor3 = serializers.IntegerField(min_value=0.0, required=True)
+    lastUpdated = serializers.DateTimeField(required=False)
+    sensor1 = serializers.IntegerField(min_value=0.0, required=False)
+    sensor2 = serializers.IntegerField(min_value=0.0, required=False)
+    sensor3 = serializers.IntegerField(min_value=0.0, required=False)
     fillLevel = serializers.DecimalField(
         max_digits=None,
         decimal_places=3,

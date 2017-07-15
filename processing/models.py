@@ -1,10 +1,13 @@
 from django.db import models
 from django.utils import timezone
+from jsonfield import JSONField
+import collections
 import datetime
 MIDRO = 6
 
 # Create your models here.
-
+def my_default():
+    return {'foo': 'bar'}
 
 class TrashCan(models.Model):
     lastEmptied = models.DateTimeField('last emptied', default=timezone.now)
@@ -28,6 +31,7 @@ class TrashCan(models.Model):
         related_name='trashcans',
         on_delete=models.CASCADE,
         default=MIDRO)
+    json = JSONField(load_kwargs={'object_pairs_hook': collections.OrderedDict}, default=my_default)
 
     def was_published_recently(self):
         now = timezone.now()
