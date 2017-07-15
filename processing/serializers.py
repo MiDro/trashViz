@@ -10,7 +10,7 @@ class TrashCanSerializer(serializers.ModelSerializer):
                   'sensor2', 'sensor3', 'fillLevel', 'percent', 
                   'full_status', 'latitude', 'longitude', 'location', 
                   'info', 'maxFill', 'installDate', 'trashID',
-                  'owner', 'json',
+                  'owner', 'json', 'payload'
                   )
     lastEmptied = serializers.DateTimeField(required=False)
     lastUpdated = serializers.DateTimeField(required=False)
@@ -49,6 +49,8 @@ class TrashCanSerializer(serializers.ModelSerializer):
     installDate = serializers.DateTimeField('installed', read_only=True)
     trashID = serializers.IntegerField(min_value=0, read_only=True)
     owner = serializers.ReadOnlyField(source='owner.username')
+    payload = serializers.JSONField(binary=False)
+
 
     def create(self, validated_data):
         """

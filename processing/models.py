@@ -32,6 +32,7 @@ class TrashCan(models.Model):
         on_delete=models.CASCADE,
         default=MIDRO)
     json = JSONField(load_kwargs={'object_pairs_hook': collections.OrderedDict}, default=my_default)
+    payload = JSONField(null=True, blank=True, default=my_default)
 
     def was_published_recently(self):
         now = timezone.now()
