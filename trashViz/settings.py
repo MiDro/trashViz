@@ -42,7 +42,7 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
 ]
 
-REST_FRAMEWORK ={
+REST_FRAMEWORK = {
     'PAGE_SIZE': 10
 }
 
