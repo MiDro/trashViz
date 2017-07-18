@@ -1,54 +1,29 @@
 from rest_framework import serializers
 from django.contrib.auth.models import User
 from processing.models import TrashCan
+import requests
+from processing.models import DEFAULT_STR, DEFAULT_DEC, DEFAULT_INT
 
+def get_adr(lat, lng):
+    # TODO: implement this
+    return "101"
+def get_name():
+    # Number of trash cans
+    num = len(TrashCan.objects.all()) + 1
+
+    if num < 10:
+        num = "0"+str(num)
+    else:
+        num = str(num)
+    return "TrashCan" + num
+def get_id():
+    return len(TrashCan.objects.all()) + 1
 
 class TrashCanSerializer(serializers.ModelSerializer):
     class Meta:
         model = TrashCan
-        fields = ('url', 'lastEmptied', 'lastUpdated', 'sensor1', 
-                  'sensor2', 'sensor3', 'fillLevel', 'percent', 
-                  'full_status', 'latitude', 'longitude', 'location', 
-                  'info', 'maxFill', 'installDate', 'trashID',
-                  'owner', 'json', 'payload'
-                  )
-    lastEmptied = serializers.DateTimeField(required=False)
-    lastUpdated = serializers.DateTimeField(required=False)
-    sensor1 = serializers.IntegerField(min_value=0.0, required=False)
-    sensor2 = serializers.IntegerField(min_value=0.0, required=False)
-    sensor3 = serializers.IntegerField(min_value=0.0, required=False)
-    fillLevel = serializers.DecimalField(
-        max_digits=None,
-        decimal_places=3,
-        min_value=0.0,
-        default=50.000)  # generated
-    percent = serializers.DecimalField(
-        max_digits=5,
-        decimal_places=2,
-        min_value=0.0,
-        default=50.00)  # generated
-    full_status = serializers.BooleanField(required=False)  # generated
-    latitude = serializers.DecimalField(
-        max_digits=None,
-        decimal_places=6,
-        min_value=None,
-        required=False)
-    longitude = serializers.DecimalField(
-        max_digits=None,
-        decimal_places=6,
-        min_value=None,
-        required=False)
-    location = serializers.CharField(
-        max_length=400, read_only=True, required=False)
-    info = serializers.CharField(max_length=500, read_only=True)
-    maxFill = serializers.DecimalField(
-        max_digits=None,
-        decimal_places=3,
-        min_value=0.0,
-        required=False)
-    installDate = serializers.DateTimeField('installed', read_only=True)
-    trashID = serializers.IntegerField(min_value=0, read_only=True)
-    owner = serializers.ReadOnlyField(source='owner.username')
+        fields =  ('header', 'payload')
+    header  = serializers.JSONField(binary=False)
     payload = serializers.JSONField(binary=False)
 
 
@@ -56,19 +31,46 @@ class TrashCanSerializer(serializers.ModelSerializer):
         """
         Create and return a new `TrashCan` instance, given the validated data.
         """
-        return TrashCan.objects.create(**validated_data)
+
+        head = validated_data['header']
+        load = validated_data['payload']
+
+        lat = load.get('latitude',   DEFAULT_DEC)
+        lng = load.get('longitude',  DEFAULT_DEC)
+
+        final_data = {
+            'messageID':   head.get('messageID',  DEFAULT_STR),
+            'sensorID':    head.get('sensorID',   DEFAULT_STR),
+            'macAddress':  head.get('macAddress', DEFAULT_STR),
+            'name':        get_name(),
+            'longitude':   lng,
+            'latitude':    lat,
+            'longitude':   get_adr(lat, lng),
+            'trashID':     get_id(),
+            'header':      head,
+            "payload":     load,
+            'bt':          validated_data['bt'],
+            'ver':         validated_data['ver'],
+            'bn':          validated_data['bn']
+        }
+
+        return TrashCan.objects.create(**final_data)
 
     def update(self, instance, validated_data):
         """
         Update and return an existing `TrashCan` instance, given the validated data.
         """
-        instance.lastEmptied = validated_data.get(
-            'lastEmptied', instance.lastEmptied)
-        instance.lastUpdated = validated_data.get(
-            'lastUpdated', instance.lastUpdated)
-        instance.sensor1 = validated_data.get('sensor1', instance.sensor1)
-        instance.sensor2 = validated_data.get('sensor2', instance.sensor2)
-        instance.sensor3 = validated_data.get('sensor3', instance.sensor3)
+
+        print("BRUH")
+
+        instance.header  = validated_data.get('header',   instance.header)
+        instance.payload = validated_data.get('payload',  instance.payload)
+        instance.bt      = validated_data.get('bt',       instance.bt)
+        instance.v       = validated_data.get('ver',      instance.v)
+        instance.bn      = validated_data.get('bn',       )
+
+        instance.messageID = head['messageID']
+
         instance.save()
         return instance
 
