@@ -1,0 +1,32 @@
+#work {
+  color: green;
+}
+
+#broke {
+  color: red;
+}
+
+#map{
+	width: 100%;
+	height: 400px;
+}
+
+#infoTable {
+  margin-top: 20px;
+}
+
+#status {
+  color:green;
+}
+
+#trashname {
+  text-align: center;
+}
+#customnav li {
+  text-align: center;
+  width: 33%
+}
+
+.container{
+	width: 100%;
+}
