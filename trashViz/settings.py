@@ -25,7 +25,7 @@ SECRET_KEY = 'a7^6u%1*17g)xs0uxfhtb^5o#+rcfr(i6vtq5e^5^(0r9@!o(s'
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = ['127.0.0.1', 'localhost', 'localhost:8000', '127.0.0.1:8000']
+ALLOWED_HOSTS = ['127.0.0.1', 'localhost', 'localhost:8000', '127.0.0.1:8000', 'pilotserver.ddns.net', '192.168.1.165']
 
 
 # Application definition
