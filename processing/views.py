@@ -3,6 +3,7 @@ from processing.serializers import TrashCanSerializer, UserSerializer
 from processing.permissions import IsOwnerOrReadOnly
 from rest_framework import generics, permissions
 from rest_framework.decorators import api_view
+from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework.reverse import reverse
 from django.contrib.auth.models import User
@@ -29,6 +30,7 @@ class TrashDetail(generics.RetrieveUpdateDestroyAPIView):
 class UserList(generics.ListAPIView):
     queryset = User.objects.all()
     serializer_class = UserSerializer
+    permission_classes = (permissions.IsAuthenticatedOrReadOnly,)
 
 
 class UserDetail(generics.RetrieveAPIView):
@@ -52,19 +54,35 @@ def get_sensor_info(data):
 
 @api_view(['PUT'])
 def api_put(request, format=None):
-    info = dict(eval(request.body.decode('utf-8')))
+    if request.method == 'PUT':
+        info = dict(eval(request.body.decode('utf-8')))
 
-    sensorID = info['head']['sensorID']
-    trashcan = TrashCan.objects.get(sensorID=sensorID)
+        sensorID = info['head']['sensorID']
+        trashcan = TrashCan.objects.get(sensorID=sensorID)
 
 
     return Response({
         'users': reverse('user-list', request=request, format=format),
         'trashcans': reverse('trashcan-list', request=request, format=format)
     })
+
+class APIRoot(APIView):
+    """
+        API Root
+    """
+    permission_classes = (permissions.IsAuthenticatedOrReadOnly,)
+    def get(self, request, format=None):
+        return Response({
+            'users': reverse('user-list', request=request, format=format),
+            'trashcans': reverse('trashcan-list', request=request, format=format)
+        })
+
+"""
 @api_view(['GET'])
 def api_root(request, format=None):
     return Response({
         'users': reverse('user-list', request=request, format=format),
         'trashcans': reverse('trashcan-list', request=request, format=format)
     })
+
+"""
