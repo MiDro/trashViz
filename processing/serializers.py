@@ -38,6 +38,7 @@ class TrashCanSerializer(serializers.ModelSerializer):
         lat = load.get('latitude',   DEFAULT_DEC)
         lng = load.get('longitude',  DEFAULT_DEC)
 
+
         final_data = {
             'messageID':   head.get('messageID',  DEFAULT_STR),
             'sensorID':    head.get('sensorID',   DEFAULT_STR),
@@ -49,9 +50,9 @@ class TrashCanSerializer(serializers.ModelSerializer):
             'trashID':     get_id(),
             'header':      head,
             "payload":     load,
-            'bt':          validated_data['bt'],
-            'ver':         validated_data['ver'],
-            'bn':          validated_data['bn']
+            'bt':          load['bt'],
+            'v':         load['ver'],
+            'bn':          load['bn']
         }
 
         return TrashCan.objects.create(**final_data)
