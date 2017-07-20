@@ -79,7 +79,7 @@ def get_sensor_info(data):
 
         sensors = [sensor1, sensor2, sensor3]
         if any([x < 0 for x in [sensor1.value, sensor2.value, sensor2.value]]):
-
+            pass
 
 
 
