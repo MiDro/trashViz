@@ -14,6 +14,7 @@ import datetime
 from datetime import timedelta
 import pytz
 
+SPEED_OF_SOUND = 343 * 1000 # cm/s
 def get_instance(s):
     return s[s.index('/')+1:s.index("/", s.index("/")+1)]
 class Sensor():
@@ -51,12 +52,23 @@ class UserDetail(generics.RetrieveAPIView):
 
 def format_time_iso(time):
     return time.isoformat()
+
+def get_distance(time):
+    # Velocity = Distance / Time
+    # So, Distance = Velocity * Time
+    time_secs = time / 1e6
+    return SPEED_OF_SOUND * time_secs
+
+
 def get_sensor_info(data):
     # Sets of readings
     readings = data['payload']['e']
 
     sensorID = data['header']['sensorID']
     trashcan = TrashCan.objects.get(sensorID=sensorID)
+    trashcan.bt = data['payload'].get('bt')
+    trashcan.v  = data['payload'].get('ver')
+    trashcan.bn = data['payload'].get('bn')
 
     month = datetime.datetime.now(tzinfo=pytz.UTC).month
     day   = datetime.datetime.now(tzinfo=pytz.UTC).day
@@ -70,16 +82,38 @@ def get_sensor_info(data):
         datetime.datetime(year, month, day, 20, 0, 0, 0, pytx.UTC) - timedelta(days=1),
         datetime.datetime(year, month, day, 6, 0, 0, 0, pytx.UTC)
     ]
+    now = times[2] # Time of last transmit
     for i in range(len(times)):
         current_time = times[i]
 
-        sensor1 = Sensor(readings[i][0], 1)
-        sensor2 = Sensor(readings[i][1], 2)
-        sensor3 = Sensor(readings[i][2], 3)
+        sensor0 = Sensor(readings[i][0], 0)
+        sensor1 = Sensor(readings[i][1], 1)
+        sensor2 = Sensor(readings[i][2], 2)
 
-        sensors = [sensor1, sensor2, sensor3]
-        if any([x < 0 for x in [sensor1.value, sensor2.value, sensor2.value]]):
-            pass
+        sensors = [sensor0, sensor1, sensor2]
+
+        # Sensor error checking
+
+        dists  = [ get_distance(sensor0.value), get_distance(sensor1.value), get_distance(sensor2.value)]
+        trashcan.sensor1 = dists[0]
+        trashcan.sensor2 = dists[1]
+        trashcan.sensor3 = dists[2]
+
+        # If any of the sensors have a negative value
+        if any([x < 0 for x in dists]):
+            trashcan.status = False # This trashcan is not fully functional
+
+            # TODO: WHat to do if sensors have errors
+
+        else:
+            trashcan.status = True
+
+            trashcan.fillLevel = sum(dists)/len(dists)
+            trashcan.percent   = trashcan.fillLevel / trashcan.maxFill * 100
+
+            trashcan.fillStatus= trashcan.percent > 70
+
+        trashcan.lastUpdated = now
 
 
 
