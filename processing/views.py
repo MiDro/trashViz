@@ -11,6 +11,7 @@ from django.contrib.auth.models import User
 from django.views.generic import View
 from django.http import HttpResponse
 import datetime
+from decimal import Decimal
 from datetime import timedelta
 import pytz
 
@@ -21,7 +22,7 @@ class Sensor():
 
     def __init__(self, data, num):
         self.instance = get_instance(data['n'])
-        self.value    = data['n']['v']
+        self.value    = int(data['v'])
         self.num      = num
 class TrashList(generics.ListCreateAPIView):
     queryset = TrashCan.objects.all()
@@ -70,17 +71,17 @@ def parse_can(data):
     trashcan.v  = data['payload'].get('ver')
     trashcan.bn = data['payload'].get('bn')
 
-    month = datetime.datetime.now(tzinfo=pytz.UTC).month
-    day   = datetime.datetime.now(tzinfo=pytz.UTC).day
-    year  = datetime.datetime.now(tzinfo=pytx.UTC).year
+    month = datetime.datetime.now(pytz.UTC).month
+    day   = datetime.datetime.now(pytz.UTC).day
+    year  = datetime.datetime.now(pytz.UTC).year
 
     # Times:   2:00PM previous day
     #         10:00PM previous day
     #          6:00PM previous day
     times = [
-        datetime.datetime(year, month, day, 14, 0, 0, 0, pytx.UTC) - timedelta(days=1),
-        datetime.datetime(year, month, day, 20, 0, 0, 0, pytx.UTC) - timedelta(days=1),
-        datetime.datetime(year, month, day, 6, 0, 0, 0, pytx.UTC)
+        datetime.datetime(year, month, day, 14, 0, 0, 0, pytz.UTC) - timedelta(days=1),
+        datetime.datetime(year, month, day, 20, 0, 0, 0, pytz.UTC) - timedelta(days=1),
+        datetime.datetime(year, month, day, 6, 0, 0, 0,  pytz.UTC)
     ]
     now = times[2] # Time of last transmit
     for i in range(len(times)):
@@ -108,7 +109,7 @@ def parse_can(data):
         else:
             trashcan.status = True
 
-            trashcan.fillLevel = sum(dists)/len(dists)
+            trashcan.fillLevel = Decimal(sum(dists)/len(dists))
             trashcan.percent   = trashcan.fillLevel / trashcan.maxFill * 100
 
             trashcan.fillStatus= trashcan.percent > 70
@@ -117,7 +118,7 @@ def parse_can(data):
         # PI Web API stuff
     trashcan.lastUpdated = now
 
-
+    trashcan.save()
 @api_view(['PUT'])
 def api_put(request, format=None):
     if request.method == 'PUT':
