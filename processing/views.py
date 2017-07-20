@@ -113,9 +113,9 @@ def get_sensor_info(data):
 
             trashcan.fillStatus= trashcan.percent > 70
 
-        trashcan.lastUpdated = now
 
-
+        # PI Web API stuff
+    trashcan.lastUpdated = now
 
 
 @api_view(['PUT'])
