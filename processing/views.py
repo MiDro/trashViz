@@ -60,7 +60,7 @@ def get_distance(time):
     return SPEED_OF_SOUND * time_secs
 
 
-def get_sensor_info(data):
+def parse_can(data):
     # Sets of readings
     readings = data['payload']['e']
 
@@ -129,6 +129,9 @@ def api_put(request, format=None):
 
         trashcan.header  = info['header']
         trashcan.payload = info['payload']
+
+
+        parse_can(info)
         trashcan.save()
     return Response(TrashCanSerializer(trashcan).data)
 
