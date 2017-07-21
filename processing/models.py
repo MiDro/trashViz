@@ -75,7 +75,8 @@ class TrashCan(models.Model):
     messageID = models.CharField(max_length=200, default=DEFAULT_NME)
     sensorID  = models.CharField(max_length=50,  default=DEFAULT_NME)
     macAddress= models.CharField(max_length=50,  default=DEFAULT_NME)
-
+    webID     = models.CharField(max_length=400, default=DEFAULT_STR)
+    info      = models.CharField(max_length=1000, default=DEFAULT_STR)
     # Original Payload information. Not acually needed, can be removed in
     # production
     header  = JSONField(null=True, blank=True, default=json_default)
@@ -85,7 +86,7 @@ class TrashCan(models.Model):
     bt      = models.IntegerField(default=DEFAULT_INT)
     v       = models.IntegerField(default=DEFAULT_INT)
     bn      = models.CharField(max_length=100, default=DEFAULT_STR)
-    
+
     def was_published_recently(self):
         now = timezone.now()
         return now - datetime.timedelta(days=1) <= self.lastEmptied <= now

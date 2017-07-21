@@ -1,5 +1,5 @@
 from django.views import generic
-from .models import TrashCan
+from processing.models import TrashCan
 
 
 class IndexView(generic.ListView):

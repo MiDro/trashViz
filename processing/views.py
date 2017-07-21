@@ -14,6 +14,7 @@ import datetime
 from decimal import Decimal
 from datetime import timedelta
 import pytz
+from processing.updateTrashCan import update_trashcans, update_trashcan
 
 SPEED_OF_SOUND = 343 * 1000 # cm/s
 def get_instance(s):
@@ -115,10 +116,13 @@ def parse_can(data):
             trashcan.fillStatus= trashcan.percent > 70
 
 
-        # PI Web API stuff
-    trashcan.lastUpdated = now
+            # PI Web API stuff
+        trashcan.lastUpdated = now
 
-    trashcan.save()
+        trashcan.save()
+
+        update_trashcan(trashcan)
+
 @api_view(['PUT'])
 def api_put(request, format=None):
     if request.method == 'PUT':
@@ -130,10 +134,8 @@ def api_put(request, format=None):
 
         trashcan.header  = info['header']
         trashcan.payload = info['payload']
-
-
-        parse_can(info)
         trashcan.save()
+        parse_can(info)
     return Response(TrashCanSerializer(trashcan).data)
 
 """
