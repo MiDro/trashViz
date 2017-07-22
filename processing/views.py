@@ -1,4 +1,4 @@
-from processing.models import TrashCan
+parsfrom processing.models import TrashCan
 from rest_framework.renderers import JSONRenderer
 from processing.serializers import TrashCanSerializer, UserSerializer
 from processing.permissions import IsOwnerOrReadOnly
@@ -25,7 +25,7 @@ class Sensor():
         self.instance = get_instance(data['n'])
         self.value    = int(data['v'])
         self.num      = num
-class TrashList(generics.ListCreateAPIView):
+class TrashList(generics.ListCreppppateAPIView):
     queryset = TrashCan.objects.all()
     serializer_class = TrashCanSerializer
     permission_classes = (permissions.IsAuthenticatedOrReadOnly,)
