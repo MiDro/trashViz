@@ -49,13 +49,13 @@ class TrashCan(models.Model):
     sensor3   = models.DecimalField(max_digits=10, decimal_places=5, default=dec_default)
 
     # Calculated height of center of trashcan.
-    fillLevel = models.DecimalField(max_digits=6,  decimal_places=3, default=dec_default)
+    fillLevel = models.DecimalField(max_digits=10,  decimal_places=3, default=dec_default)
 
     # Maximamum height of trash
-    maxFill   = models.DecimalField(max_digits=6,  decimal_places=3, default=dec_default)
+    maxFill   = models.DecimalField(max_digits=10,  decimal_places=3, default=dec_default)
 
     # fillLevel / maxFill
-    percent   = models.DecimalField(max_digits=6,  decimal_places=3, default=dec_default)
+    percent   = models.DecimalField(max_digits=10,  decimal_places=3, default=dec_default)
 
     # Whether or not everything is working
     status    = models.BooleanField(default=True)

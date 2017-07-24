@@ -1,4 +1,4 @@
-parsfrom processing.models import TrashCan
+from processing.models import TrashCan
 from rest_framework.renderers import JSONRenderer
 from processing.serializers import TrashCanSerializer, UserSerializer
 from processing.permissions import IsOwnerOrReadOnly
@@ -25,7 +25,7 @@ class Sensor():
         self.instance = get_instance(data['n'])
         self.value    = int(data['v'])
         self.num      = num
-class TrashList(generics.ListCreppppateAPIView):
+class TrashList(generics.ListAPIView):
     queryset = TrashCan.objects.all()
     serializer_class = TrashCanSerializer
     permission_classes = (permissions.IsAuthenticatedOrReadOnly,)
@@ -113,7 +113,7 @@ def parse_can(data):
             trashcan.fillLevel = Decimal(sum(dists)/len(dists))
             trashcan.percent   = trashcan.fillLevel / trashcan.maxFill * 100
 
-            trashcan.fillStatus= trashcan.percent > 70
+            trashcan.fillStatus= float(trashcan.percent) > 70
 
 
             # PI Web API stuff
