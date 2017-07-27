@@ -5,7 +5,8 @@ from processing import views
 # API endpoints
 urlpatterns = [
     url(r'^root/$', views.APIRoot.as_view(), name='api_root'),
-    url(r'^objects/26247/$', views.api_put, name='api_put'),
+    url(r'^objects/26247$', views.api_put, name='api_put'),
+    url(r'^objects/26247\/$', views.api_put, name='api_put'),
     url(r'^trashcans/$', views.TrashList.as_view(), name='trashcan-list'),
     url(r'^trashcans/(?P<pk>[0-9]+)$', views.TrashDetail.as_view(), name='trashcan-detail'),
     url(r'^users/$', views.UserList.as_view(), name='user-list'),

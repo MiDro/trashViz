@@ -1,4 +1,5 @@
 from processing.models import TrashCan
+from django.utils import timezone
 import os
 import requests
 
@@ -21,12 +22,22 @@ def setValue(webid, val):
     data = {
         "Value": val
     }
-    response = requests.post(
-        url=url,
-        verify=False,
-        auth=auth,
-        headers=HEADERS,
-        json=data)
+
+    try:
+        response = requests.post(
+            url=url,
+            verify=False,
+            auth=auth,
+            headers=HEADERS,
+            json=data)
+    except:
+        loggingFile = open("log.txt", "a")
+        loggingFile.write("code: {} at {}\n".format(response.status_code, timezone.now))
+        loggingFile.close()
+
+    loggingFile = open("log.txt", "a")
+    loggingFile.write(str(response.status_code))
+    loggingFile.close()
     return response.status_code
 
 
@@ -77,10 +88,16 @@ def update_trashcan(trashcan):
         "Status":		trashcan.status
     }
 
+    is_success = True
     for attr in data:
-        print(attr, end="     ")
         r = setValue(getWebId(curr_url, attr), data[attr])
-        print("Done")
+        if not (200 <= r < 300):
+            filler = open("log.txt", "a")
+            filler.append(str(attr))
+            filler.close()
+            is_success = False
+    return is_success
+
 
 
 def update_trashcans():

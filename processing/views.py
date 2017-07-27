@@ -63,10 +63,12 @@ def get_distance(time):
 
 
 def parse_can(data):
+
+    is_success = True
     # Sets of readings
     readings = data['payload']['e']
 
-    sensorID = data['header']['sensorID']
+    sensorID = data['header']['sensorID'].lower()
     trashcan = TrashCan.objects.get(sensorID=sensorID)
     trashcan.bt = data['payload'].get('bt')
     trashcan.v  = data['payload'].get('ver')
@@ -121,22 +123,34 @@ def parse_can(data):
 
         trashcan.save()
 
-        update_trashcan(trashcan)
+        response = update_trashcan(trashcan)
+        if not response:
+            is_success = False
 
-@api_view(['PUT'])
+    return is_success
+
+@api_view(['PUT', 'POST'])
 def api_put(request, format=None):
-    if request.method == 'PUT':
-        info = dict(eval(request.body.decode('utf-8')))
+    if request.method == 'PUT' or request.method == 'POST':
+        try:
 
-        sensorID = info['header']['sensorID']
-        trashcan = TrashCan.objects.get(sensorID=sensorID)
+            info = dict(eval(request.body.decode('utf-8')))
+
+            sensorID = info['header']['sensorID']
+            trashcan = TrashCan.objects.get(sensorID=sensorID)
 
 
-        trashcan.header  = info['header']
-        trashcan.payload = info['payload']
-        trashcan.save()
-        parse_can(info)
-    return Response(TrashCanSerializer(trashcan).data)
+            trashcan.header  = info['header']
+            trashcan.payload = info['payload']
+            trashcan.save()
+
+        except:
+            return Response({"error code":500,"message":"Data saving error"})
+        response = parse_can(info)
+
+        if response:
+            return Response({"response code": 201})
+        return Response({"error code":500, "message":"contact midro-1@googlegroups.com"})
 
 """
     return Response({
