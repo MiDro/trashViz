@@ -11,9 +11,11 @@ from django.contrib.auth.models import User
 from django.views.generic import View
 from django.http import HttpResponse
 import datetime
+from rest_framework import status
 from decimal import Decimal
 from datetime import timedelta
 import pytz
+from django.shortcuts import render
 from processing.updateTrashCan import update_trashcans, update_trashcan
 
 SPEED_OF_SOUND = 343 * 1000 # cm/s
@@ -137,27 +139,25 @@ def api_put(request, format=None):
             info = dict(eval(request.body.decode('utf-8')))
 
             sensorID = info['header']['sensorID']
-            trashcan = TrashCan.objects.get(sensorID=sensorID)
+            trashcans = TrashCan.objects.filter(sensorID=sensorID)
 
+            if len(trashcans) == 0:
+                return Response({"error code":400,"message":"Invalid sensorID."}, status=status.HTTP_400_BAD_REQUEST)
+
+            trashcan = trashcans[0]
 
             trashcan.header  = info['header']
             trashcan.payload = info['payload']
             trashcan.save()
 
         except:
-            return Response({"error code":500,"message":"Data saving error"})
+            return Response({"error code":500,"message":"Data saving error"}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
         response = parse_can(info)
 
         if response:
-            return Response({"response code": 201})
-        return Response({"error code":500, "message":"contact midro-1@googlegroups.com"})
+            return Response({"response code": 201}, status=status.HTTP_201_CREATED)
+        return Response({"error code":500, "message":"contact midro-l@googlegroups.com"}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
-"""
-    return Response({
-        'users': reverse('user-list', request=request, format=format),
-        'trashcans': reverse('trashcan-list', request=request, format=format)
-    })
-"""
 class APIRoot(APIView):
     """
         API Root
@@ -168,3 +168,7 @@ class APIRoot(APIView):
             'users': reverse('user-list', request=request, format=format),
             'trashcans': reverse('trashcan-list', request=request, format=format)
         })
+
+
+def docs(request):
+    return render(request, "processing/docs.html")
