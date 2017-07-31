@@ -20,7 +20,7 @@ def json_default():
     """
         Default jsonfield
     """
-    return {'foo': 'bar'}
+    return {'default': 'default'}
 
 def dec_default():
     return DEFAULT_DEC

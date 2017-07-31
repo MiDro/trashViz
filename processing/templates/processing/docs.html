@@ -1,6 +1,401 @@
-<!-- Latest compiled and minified CSS -->
-<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u" crossorigin="anonymous">
-<!-- Optional theme -->
-<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap-theme.min.css" integrity="sha384-rHyoN1iRsVXV4nD0JutlnGaslCJuC7uwjduW9SVrLvRYooPp2bWYgmgJQIXwl/Sp" crossorigin="anonymous">
-<!-- Latest compiled and minified JavaScript -->
-<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js" integrity="sha384-Tc5IQib027qvyjSMfHjOMaLkfuWVxZxUPnCJA7l2mCWNIpG9mGCD8wGNIcPD7Txa" crossorigin="anonymous"></script>
+
+
+<head>
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+  <!-- Latest compiled and minified CSS -->
+  <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u" crossorigin="anonymous">
+  <!-- Optional theme -->
+  <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap-theme.min.css" integrity="sha384-rHyoN1iRsVXV4nD0JutlnGaslCJuC7uwjduW9SVrLvRYooPp2bWYgmgJQIXwl/Sp" crossorigin="anonymous">
+  <!-- Latest compiled and minified JavaScript -->
+  <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js" integrity="sha384-Tc5IQib027qvyjSMfHjOMaLkfuWVxZxUPnCJA7l2mCWNIpG9mGCD8wGNIcPD7Txa" crossorigin="anonymous"></script>
+
+<style>
+table, th, td {
+    border: 1px solid black;
+    border-collapse: collapse;
+}
+th, td {
+    padding: 5px;
+    text-align: left;
+}
+.pagediv{
+  border: none;
+  border-collapse: collapse;
+}
+</style>
+</head>
+
+<h1>API Requests</h1>
+
+<h2>PUT Request</h2>
+<table width=100% class="table pagediv">
+  <tr>
+    <td width=60% class="td pagediv">
+      <pre><code>PUT https://pilotserver.ddns.net/objects/26247</code></pre>
+    </td>
+    <td width=40% class="td pagediv">
+      <pre><code>curl -X PUT https://pilotserver.ddns.net/objects/26247 --insecure</code></pre>
+    </td>
+  </tr>
+</table>
+
+<h2>Payload Headers*</h2>
+*external headers<br>
+The payload contains both an external set of headers and an internal set of headers. The internal headers are contained in the JSON file along with the rest of the payload.
+
+<table width=100% class="table pagediv">
+  <tr>
+    <td width=60% class="td pagediv">
+        <table style="width:100%">
+          <col style='width:10%'>
+          <col style='width:10%'>
+          <col style='width:35%'>
+          <col style='width:45%'>
+          <tr>
+            <th>Field</th>
+            <th>Value</th>
+            <th>Description</th>
+          </tr>
+          <tr>
+            <td>authorization</td>
+            <td>string</td>
+            <td>specifies token authentication parameter</td>
+          </tr>
+          <tr>
+            <td>content-type</td>
+            <td>application/json</td>
+            <td>specifies type of input datas (always JSON)</td>
+          </tr>
+        </table>
+    </td>
+    <td width=40% class="td pagediv">
+      <pre><code>  -H 'authorization: Token *put token here*' \
+  -H 'content-type: application/json' \</code></pre>
+    </td>
+  </tr>
+</table>
+
+
+
+<h2>Payload</h2>
+<h3>Parameters</h3>
+<table width=100% class="table pagediv">
+  <tr>
+    <td width=60% class="td pagediv">
+      <table style="width:100%">
+        <col style='width:10%'>
+        <col style='width:10%'>
+        <col style='width:15%'>
+        <col style='width:65%'>
+        <tr>
+          <th>Section</th>
+          <th>Field</th>
+          <th>Type</th>
+          <th>Description</th>
+        </tr>
+        <tr>
+          <td rowspan="2">header**</td>
+          <td>messageID</td>
+          <td>String</td>
+          <td>client-specified tag</td>
+        </tr>
+        <tr>
+          <td>sensorID</td>
+          <td>String</td>
+          <td>unique ID used to access specific sensor <br>(Note: If sensorID does not match existing sensorID, request will fail)</td>
+        </tr>
+        <tr>
+          <td rowspan="4">payload</td>
+          <td>bn</td>
+          <td>String</td>
+          <td>base name string prepended to each request id</td>
+        </tr>
+        <tr>
+          <td>e</td>
+          <td>Array</td>
+          <td> nested array (Resource Array) of sensor readings in IPSO objects format <br>(Note: one reading for each of the three sensors, three times a day)***</td>
+        </tr>
+        <tr>
+          <td>bt</td>
+          <td>Integer</td>
+          <td>base time that time values are relative to</td>
+        </tr>
+        <tr>
+          <td>ver</td>
+          <td>Integer</td>
+          <td>version</td>
+        </tr>
+      </table>
+      **internal headers
+      <h3>Resource Array Parameters</h3>
+      <table width=100%>
+        <col style="width:20%">
+        <col style="width:10%">
+        <col style="width:35%">
+        <col style="width:35%">
+        <tr>
+          <th>Field</th>
+          <th>Type</th>
+          <th>Format</th>
+          <th>Description</th>
+        </tr>
+        <tr>
+          <td>(Name Value) n</td>
+          <td>String</td>
+          <td>:sensortype/:sensornumber/:returnvalue****</td>
+          <td>specifies timestamp as return type for each sensor</td>
+        </tr>
+        <tr>
+          <td>(Float Value) v</td>
+          <td>Integer</td>
+          <td></td>
+          <td>distance value from each sensor</td>
+        </tr>
+      </table>
+      <br>
+      <h3>****Name Value Options</h3>
+      <table width=100%>
+        <tr>
+          <th>Code</th>
+          <th>Value</th>
+          <th>Description</th>
+        </tr>
+        <tr>
+          <td>sensortype</td>
+          <td>26247</td>
+          <td>specifies type of sensor</td>
+        </tr>
+        <tr>
+          <td>sensornumber</td>
+          <td>0, 1, 2</td>
+          <td>specifies which sensor in each unit</td>
+        </tr>
+        <tr>
+          <td>returnvalue</td>
+          <td>26250</td>
+          <td>specifies timestamp return type</td>
+        </tr>
+      </table>
+    </td>
+    <td width=40% class="td pagediv">
+      <pre><code>  -d '{
+"header":{
+  "messageID":"",
+  "sensorID":"*put sensor id here*"
+},
+
+"payload":{
+
+  "bn":"urn:dev:mac:0024befffe804ff1/",
+  "e":[
+    [{ "n":"26247/0/26250", "v":100 },
+
+     { "n":"26247/1/26250", "v":120 },
+
+     { "n":"26247/2/26250", "v":140 }],
+
+    [{ "n":"26247/0/26250", "v":100 },
+
+     { "n":"26247/1/26250", "v":150 },
+
+     { "n":"26247/2/26250", "v":130 }],
+
+    [{ "n":"26247/0/26250", "v":680 },
+
+     { "n":"26247/1/26250", "v":695},
+
+     { "n":"26247/2/26250", "v":700 }]
+  ],
+
+  "bt":1276020076,
+
+  "ver":2
+}
+}'</code>
+</pre>
+    </td>
+  </tr>
+</table>
+
+<h2>Response</h2>
+
+<table width=100% class="table pagediv">
+  <tr>
+    <td width=60% class="td pagediv">
+      <table width=100%>
+        <col style='width:50%'>
+        <col style='width:25%'>
+        <col style='width:25%'>
+        <tr>
+          <th>Response</th>
+          <th>Reason</th>
+          <th>Fix</th>
+        </tr>
+        <tr>
+          <td><pre><code>{"response code": 201}</code></pre></td>
+          <td>Request Successful</td>
+          <td>N.A.</td>
+        </tr>
+        <tr>
+          <td><pre><code>{"error code":400,"message":"Invalid sensorID."}</code></pre></td>
+          <td>sensorID value does not correspond to an existing sensorID</td>
+          <td>assign existing value to sensorID</td>
+        </tr>
+        <tr>
+          <td><pre><code>{"error code":500,"message":"Data saving error"}</code></pre></td>
+          <td>Server could not save data sent through request.</td>
+          <td>Ensure that header and payload are in correct format with the required parameters.</td>
+        </tr>
+      </table>
+    </td>
+    <td width=40% class="td pagediv">
+    </td>
+  </tr>
+</table>
+
+
+<h2>Sample PUT Request</h2>
+
+<table width=100% class="table pagediv">
+  <tr>
+    <td width=6
+
+
+
+    0% class="td pagediv">
+        This PUT request is missing a token that can be obtained through midro-l@googlegroups.com.
+    </td>
+    <td width=40% class="td pagediv">
+      <pre><code>curl -X PUT https://pilotserver.ddns.net/objects/26247 --insecure\
+  -H 'authorization: Token ***********************************' \
+  -H 'content-type: application/json' \
+  -d '{
+"header":{
+  "messageID":"",
+  "sensorID":"af17ee"
+},
+
+"payload":{
+
+  "bn":"urn:dev:mac:0024befffe804ff1/",
+  "e":[
+		[{ "n":"26247/0/26250", "v":100 },
+
+		 { "n":"26247/1/26250", "v":120 },
+
+		 { "n":"26247/2/26250", "v":140 }],
+
+		[{ "n":"26247/0/26250", "v":100 },
+
+		 { "n":"26247/1/26250", "v":150 },
+
+		 { "n":"26247/2/26250", "v":130 }],
+
+		[{ "n":"26247/0/26250", "v":680 },
+
+		 { "n":"26247/1/26250", "v":695},
+
+		 { "n":"26247/2/26250", "v":700 }]
+	],
+
+  "bt":1276020076,
+
+  "ver":2
+}
+}'</code><pre>
+    </td>
+
+  </tr>
+</table>
+
+
+
+<h2>GET Request</h2>
+<table width=100% class="table pagediv">
+  <tr>
+    <td width=60% class="td pagediv">
+      <pre><code>GET https://pilotserver.ddns.net/trashcans/</code></pre>
+    </td>
+    <td width=40% class="td pagediv">
+      <pre><code>curl -X GET https://pilotserver.ddns.net/trashcans/ --insecure</code></pre>
+    </td>
+  </tr>
+</table>
+
+<h2>URL Parameters</h2>
+<table width=100% class="table pagediv">
+None
+</table>
+
+<h2>Sample Response</h2>
+<table width=100% class="table pagediv">
+  <tr>
+    <td width=60% class="td pagediv">
+      Provides a Response that matches the previous PUT request.
+    </td>
+    <td width=40% class="td pagediv">
+      <pre><code>{
+   "count": 1,
+   "next": null,
+   "previous": null,
+   "results": [
+      {
+         "header": {
+            "messageID": "",
+            "sensorID": "af17ee"
+         },
+         "payload": {
+            "bn": "urn:dev:mac:0024befffe804ff1/",
+            "e": [
+               [
+                  {
+                     "n": "26247/0/26250",
+                     "v": 100
+                  },
+                  {
+                     "n": "26247/1/26250",
+                     "v": 120
+                  },
+                  {
+                     "n": "26247/2/26250",
+                     "v": 140
+                  }
+               ],
+               [
+                  {
+                     "n": "26247/0/26250",
+                     "v": 100
+                  },
+                  {
+                     "n": "26247/1/26250",
+                     "v": 150
+                  },
+                  {
+                     "n": "26247/2/26250",
+                     "v": 130
+                  }
+               ],
+               [
+                  {
+                     "n": "26247/0/26250",
+                     "v": 680
+                  },
+                  {
+                     "n": "26247/1/26250",
+                     "v": 695
+                  },
+                  {
+                     "n": "26247/2/26250",
+                     "v": 700
+                  }
+               ]
+            ],
+            "bt": 1276020076,
+            "ver": 2
+         }
+      }
+   ]
+}</code></pre><!-- Really Herrick? A incorrectly closed tag? Smh. -->
+    </td>
+  </tr>
+</table>
