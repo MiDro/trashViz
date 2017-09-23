@@ -34,7 +34,7 @@ INSTALLED_APPS = [
     'rest_framework',
     'processing.apps.ProcessingConfig',
     'map.apps.MapConfig',
-    'django.contrib.admin',
+    #'django.contrib.admin', Disable Admin
     'django.contrib.auth',
     'django.contrib.contenttypes',
     'django.contrib.sessions',
