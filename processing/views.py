@@ -130,8 +130,6 @@ def parse_can(data):
         trashcan.bn = data['payload'].get('bn')
 
 
-        current_time = times[i]
-
         sensor0 = Sensor(readings[i][0], 0)
         sensor1 = Sensor(readings[i][1], 1)
         sensor2 = Sensor(readings[i][2], 2)
@@ -162,8 +160,13 @@ def parse_can(data):
 @api_view(['PUT'])
 def api_put(request, format=None):
     if request.method == 'PUT':
-        info = dict(eval(request.body.decode('utf-8')))
-
+        try:
+            info = dict(eval(request.body.decode('utf-8')))
+        except:
+            return Response({
+              "error_code": 500,
+              "message": "No body in request"
+            })
         sensorID = info['header']['sensorID']
         try:
             trashcan = TrashCan.objects.get(sensorID=sensorID)
