@@ -7,7 +7,8 @@ MIDRO = 6
 
 # Default date to see if a new instance of trash can
 DEFAULT_DATE = datetime.datetime(1997, 5, 15, 7, 44)
-DEFAULT_DEC  = -50.0;
+DEFAULT_DEC  = -50
+.0;
 DEFAULT_STR  = '101 Estudillo Avenue'
 DEFAULT_NME  = 'MiDro'
 DEFAULT_INT  = -1
@@ -31,7 +32,8 @@ class TrashCan(models.Model):
         'auth.User',
         related_name='trashcans',
         on_delete=models.CASCADE,
-        default=MIDRO)
+        default=MIDRO,
+        db_constraint=False)
 
     # Last emptied is when the workers actually take out the trash in the
     # morning, while last updated is the time the node last transmitted.
@@ -85,7 +87,7 @@ class TrashCan(models.Model):
     bt      = models.IntegerField(default=DEFAULT_INT)
     v       = models.IntegerField(default=DEFAULT_INT)
     bn      = models.CharField(max_length=100, default=DEFAULT_STR)
-    
+
     def was_published_recently(self):
         now = timezone.now()
         return now - datetime.timedelta(days=1) <= self.lastEmptied <= now

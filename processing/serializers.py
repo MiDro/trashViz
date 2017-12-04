@@ -62,8 +62,6 @@ class TrashCanSerializer(serializers.ModelSerializer):
         Update and return an existing `TrashCan` instance, given the validated data.
         """
 
-        print("BRUH")
-
         instance.header  = validated_data.get('header',   instance.header)
         instance.payload = validated_data.get('payload',  instance.payload)
         instance.bt      = validated_data.get('bt',       instance.bt)

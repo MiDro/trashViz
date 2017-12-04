@@ -22,7 +22,12 @@ class Sensor():
     def __init__(self, data, num):
         self.instance = data['n'][data['n'].index('/')+1:
                         data['n'].index("/", data['n'].index("/")+1)]
-        self.value    = int(data['v'])
+        if 'v' in data:
+            self.value    = int(data['v'])
+        elif 'bv' in data:
+            self.value    = -1
+        else:
+            self.value    = -1
         self.num      = num
 
 
@@ -129,10 +134,9 @@ def parse_can(data):
         trashcan.v  = data['payload'].get('ver')
         trashcan.bn = data['payload'].get('bn')
 
-
-        sensor0 = Sensor(readings[i][0], 0)
-        sensor1 = Sensor(readings[i][1], 1)
-        sensor2 = Sensor(readings[i][2], 2)
+        sensor0 = Sensor(readings[0], 0)
+        sensor1 = Sensor(readings[1], 1)
+        sensor2 = Sensor(readings[2], 2)
 
         sensors = [sensor0, sensor1, sensor2]
 
@@ -154,7 +158,7 @@ def parse_can(data):
 
             trashcan.fillStatus= trashcan.percent > 70
 
-        trashcan.lastUpdated = now
+        trashcan.lastUpdated = datetime.datetime.now()
 
         trashcan.save()
 @api_view(['PUT'])
@@ -179,7 +183,7 @@ def api_put(request, format=None):
 
         trashcan.header  = info['header']
         trashcan.payload = info['payload']
-
+        trashcan.save()
         try:
             parse_can(info)
         except:
