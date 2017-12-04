@@ -16,14 +16,16 @@ from datetime import timedelta
 import pytz
 
 SPEED_OF_SOUND = 343 * 1000 # cm/s
-def get_instance(s):
-    return s[s.index('/')+1:s.index("/", s.index("/")+1)]
+DEBUG_MODE = True
 class Sensor():
 
     def __init__(self, data, num):
-        self.instance = get_instance(data['n'])
+        self.instance = data['n'][data['n'].index('/')+1:
+                        data['n'].index("/", data['n'].index("/")+1)]
         self.value    = int(data['v'])
         self.num      = num
+
+
 class TrashList(generics.ListCreateAPIView):
     queryset = TrashCan.objects.all()
     serializer_class = TrashCanSerializer
@@ -51,9 +53,6 @@ class UserDetail(generics.RetrieveAPIView):
     permission_classes = (permissions.IsAuthenticatedOrReadOnly,
                           IsOwnerOrReadOnly,)
 
-def format_time_iso(time):
-    return time.isoformat()
-
 def get_distance(time):
     # Velocity = Distance / Time
     # So, Distance = Velocity * Time
@@ -62,29 +61,75 @@ def get_distance(time):
 
 
 def parse_can(data):
-    # Sets of readings
-    readings = data['payload']['e']
+    if not DEBUG_MODE:
+        # Sets of readings
+        readings = data['payload']['e']
 
-    sensorID = data['header']['sensorID']
-    trashcan = TrashCan.objects.get(sensorID=sensorID)
-    trashcan.bt = data['payload'].get('bt')
-    trashcan.v  = data['payload'].get('ver')
-    trashcan.bn = data['payload'].get('bn')
+        sensorID = data['header']['sensorID']
+        trashcan = TrashCan.objects.get(sensorID=sensorID)
+        trashcan.bt = data['payload'].get('bt')
+        trashcan.v  = data['payload'].get('ver')
+        trashcan.bn = data['payload'].get('bn')
 
-    month = datetime.datetime.now(pytz.UTC).month
-    day   = datetime.datetime.now(pytz.UTC).day
-    year  = datetime.datetime.now(pytz.UTC).year
+        month = datetime.datetime.now(pytz.UTC).month
+        day   = datetime.datetime.now(pytz.UTC).day
+        year  = datetime.datetime.now(pytz.UTC).year
 
-    # Times:   2:00PM previous day
-    #         10:00PM previous day
-    #          6:00PM previous day
-    times = [
-        datetime.datetime(year, month, day, 14, 0, 0, 0, pytz.UTC) - timedelta(days=1),
-        datetime.datetime(year, month, day, 20, 0, 0, 0, pytz.UTC) - timedelta(days=1),
-        datetime.datetime(year, month, day, 6, 0, 0, 0,  pytz.UTC)
-    ]
-    now = times[2] # Time of last transmit
-    for i in range(len(times)):
+        # Times:   2:00PM previous day
+        #         10:00PM previous day
+        #          6:00PM previous day
+        times = [
+            datetime.datetime(year, month, day, 14, 0, 0, 0, pytz.UTC) - timedelta(days=1),
+            datetime.datetime(year, month, day, 20, 0, 0, 0, pytz.UTC) - timedelta(days=1),
+            datetime.datetime(year, month, day, 6, 0, 0, 0,  pytz.UTC)
+        ]
+        now = times[2] # Time of last transmit
+        for i in range(len(times)):
+            current_time = times[i]
+
+            sensor0 = Sensor(readings[i][0], 0)
+            sensor1 = Sensor(readings[i][1], 1)
+            sensor2 = Sensor(readings[i][2], 2)
+
+            sensors = [sensor0, sensor1, sensor2]
+
+            # Sensor error checking
+
+            dists  = [ get_distance(sensor0.value), get_distance(sensor1.value), get_distance(sensor2.value)]
+            trashcan.sensor1 = dists[0]
+            trashcan.sensor2 = dists[1]
+            trashcan.sensor3 = dists[2]
+
+            # If any of the sensors have a negative value
+            if any([x < 0 for x in dists]):
+                trashcan.status = False # This trashcan is not fully functional
+
+                # TODO: WHat to do if sensors have errors
+
+            else:
+                trashcan.status = True
+
+                trashcan.fillLevel = Decimal(sum(dists)/len(dists))
+                trashcan.percent   = trashcan.fillLevel / trashcan.maxFill * 100
+
+                trashcan.fillStatus= trashcan.percent > 70
+
+
+            # PI Web API stuff
+        trashcan.lastUpdated = now
+
+        trashcan.save()
+    else:
+        # Sets of readings
+        readings = data['payload']['e']
+
+        sensorID = data['header']['sensorID']
+        trashcan = TrashCan.objects.get(sensorID=sensorID)
+        trashcan.bt = data['payload'].get('bt')
+        trashcan.v  = data['payload'].get('ver')
+        trashcan.bn = data['payload'].get('bn')
+
+
         current_time = times[i]
 
         sensor0 = Sensor(readings[i][0], 0)
@@ -103,9 +148,6 @@ def parse_can(data):
         # If any of the sensors have a negative value
         if any([x < 0 for x in dists]):
             trashcan.status = False # This trashcan is not fully functional
-
-            # TODO: WHat to do if sensors have errors
-
         else:
             trashcan.status = True
 
@@ -114,34 +156,37 @@ def parse_can(data):
 
             trashcan.fillStatus= trashcan.percent > 70
 
+        trashcan.lastUpdated = now
 
-        # PI Web API stuff
-    trashcan.lastUpdated = now
-
-    trashcan.save()
+        trashcan.save()
 @api_view(['PUT'])
 def api_put(request, format=None):
     if request.method == 'PUT':
         info = dict(eval(request.body.decode('utf-8')))
 
         sensorID = info['header']['sensorID']
-        trashcan = TrashCan.objects.get(sensorID=sensorID)
+        try:
+            trashcan = TrashCan.objects.get(sensorID=sensorID)
+        except:
+            return Response({
+              "error_code": 401,
+              "message": "Authentication failure"
+            })
 
 
         trashcan.header  = info['header']
         trashcan.payload = info['payload']
 
-
-        parse_can(info)
+        try:
+            parse_can(info)
+        except:
+            return Response({
+              "error_code":500,
+              "message": "Data saving error"
+            })
         trashcan.save()
-    return Response(TrashCanSerializer(trashcan).data)
+    return Response(TrashCanSerializer(trashcan).data, status=201)
 
-"""
-    return Response({
-        'users': reverse('user-list', request=request, format=format),
-        'trashcans': reverse('trashcan-list', request=request, format=format)
-    })
-"""
 class APIRoot(APIView):
     """
         API Root
