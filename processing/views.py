@@ -15,6 +15,9 @@ from decimal import Decimal
 from datetime import timedelta
 import pytz
 
+
+from .message import send_message
+
 SPEED_OF_SOUND = 343 * 1000 # cm/s
 DEBUG_MODE = True
 class Sensor():
@@ -150,16 +153,18 @@ def parse_can(data):
         # If any of the sensors have a negative value
         if any([x < 0 for x in dists]):
             trashcan.status = False # This trashcan is not fully functional
+            send_message("The trash can is out of order.")
         else:
             trashcan.status = True
 
             trashcan.fillLevel = Decimal(sum(dists)/len(dists))
             trashcan.percent   = trashcan.fillLevel / trashcan.maxFill * 100
 
+            send_message("The trash can is {}% full".format(int(trashcan.percent)))
             trashcan.fillStatus= trashcan.percent > 70
 
         trashcan.lastUpdated = datetime.datetime.now()
-
+        
         trashcan.save()
 @api_view(['PUT'])
 def api_put(request, format=None):
