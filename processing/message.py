@@ -10,5 +10,6 @@ def send_message(msg):
         "From": "4158872366",
         "To": "4153686487"
     }
-    resp = requests.post(url, data=data, auth=(account, token))
+    return
+    #resp = requests.post(url, data=data, auth=(account, token))
 

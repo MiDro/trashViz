@@ -26,6 +26,13 @@ def json_default():
 def dec_default():
     return DEFAULT_DEC
 
+
+class PhoneNumber(models.Model):
+    number = models.CharField(max_length=50)
+    name   = models.CharField(max_length=70)
+    role   = models.IntegerField()
+
+
 # Create your models here.
 class TrashCan(models.Model):
     owner = models.ForeignKey(

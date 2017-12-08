@@ -3,7 +3,7 @@ from rest_framework.renderers import JSONRenderer
 from processing.serializers import TrashCanSerializer, UserSerializer
 from processing.permissions import IsOwnerOrReadOnly
 from rest_framework import generics, permissions
-from rest_framework.decorators import api_view, renderer_classes
+from rest_framework.decorators import api_view, renderer_classes, authentication_classes, permission_classes
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework.reverse import reverse
@@ -32,7 +32,6 @@ class Sensor():
         else:
             self.value    = -1
         self.num      = num
-
 
 class TrashList(generics.ListCreateAPIView):
     queryset = TrashCan.objects.all()
@@ -166,16 +165,18 @@ def parse_can(data):
         trashcan.lastUpdated = datetime.datetime.now()
         
         trashcan.save()
-@api_view(['PUT'])
+@api_view(['PUT', 'POST'])
+@authentication_classes([])
+@permission_classes([])
 def api_put(request, format=None):
-    if request.method == 'PUT':
+    if request.method == 'PUT' or request.method == 'POST':
         try:
             info = dict(eval(request.body.decode('utf-8')))
         except:
             return Response({
               "error_code": 500,
               "message": "No body in request"
-            })
+            }, status=500)
         sensorID = info['header']['sensorID']
         try:
             trashcan = TrashCan.objects.get(sensorID=sensorID)
@@ -183,7 +184,7 @@ def api_put(request, format=None):
             return Response({
               "error_code": 401,
               "message": "Authentication failure"
-            })
+            }, status=401)
 
 
         trashcan.header  = info['header']
@@ -195,9 +196,9 @@ def api_put(request, format=None):
             return Response({
               "error_code":500,
               "message": "Data saving error"
-            })
+        })
         trashcan.save()
-    return Response(TrashCanSerializer(trashcan).data, status=201)
+    return Response({"response_code":201}, status=201)
 
 class APIRoot(APIView):
     """
@@ -207,5 +208,5 @@ class APIRoot(APIView):
     def get(self, request, format=None):
         return Response({
             'users': reverse('user-list', request=request, format=format),
-            'trashcans': reverse('trashcan-list', request=request, format=format)
+            'trashcans': reverse('trashcan-list', request=request, format=format),
         })
