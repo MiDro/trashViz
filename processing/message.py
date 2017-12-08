@@ -6,6 +6,7 @@ def send_message(msg):
     url     = "https://api.twilio.com/2010-04-01/Accounts/ACe54aaa99ade5b73c877fa88c750c3cbd/Messages"
     
     data = {
+        "Body": msg,
         "From": "4158872366",
         "To": "4153686487"
     }
